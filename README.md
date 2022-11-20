@@ -10,6 +10,10 @@ Some has done it in 6.5 microseconds (vs. the OP's > 1 month!). I'll be happy wi
 
 Uses this word list: https://raw.githubusercontent.com/dwyl/english-words/master/words.txt
 
+The video says the answer we are looking for is there are 538 lists of 5 words that contain 25 unique letters.
+
+I haven't looked at any solutions to this problem, because I want to see what I come up with first.
+
 ## first naive approach
 
 Start by reading lines in using this approach: https://doc.rust-lang.org/rust-by-example/std_misc/file/read_lines.html

@@ -57,7 +57,7 @@ fn vec_has_unique_elements(mut char_vec: Vec<char>) -> bool {
 }
 
 fn print_word_list(list: Vec<Vec<char>>) {
-    for (_count, char_vec) in list.iter().enumerate() {
+    for (_i, char_vec) in list.iter().enumerate() {
         println!("{:?}", char_vec);
     }
 }
