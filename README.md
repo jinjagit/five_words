@@ -19,12 +19,14 @@ Store each line as a string ('word') in a vec, but filter out 'words' before add
 - not five characters long
 - contains any duplicate characters
 
-Total runtime: 136 ms
+Total runtime: 133 ms
 Resulting Vec contains 18904 words
 
 Idea for next step:
 
 Iterate over Vec, stopping at n-1 element.
 Convert first word to vec of chars, and then compare with all other words (also a vecs of chars), checking if combined 2 words contain no duplicate chars.
-- If no duplicates, then save the pair of words in a collection, which includes the index of the words: `Vec<[Vec<char>, index, Vec<char>, index], [...], ...>`
+- If no duplicates, then save the pair of words in a collection, which includes the index of the words: `Vec<[Vec<char>, Vec<char>, [index, index]], [...], ...>`
 - do the same for all words, only checking by combining with words later in Vec... this should never repeat a comparison, and will result in all possible word pairs being checked and filtered.
+- use similar process to see which words can be added to the 2-word pairs list
+- now we have a list of word pairs and word triplets that all contain unique letters, so now just need a smart way to check which word pairs can be added to which word triplets.

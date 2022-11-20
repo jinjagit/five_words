@@ -17,13 +17,9 @@ fn main() {
                 let word = ip.to_lowercase();
 
                 // Check word is 5 characters, and all characters are letters
-                if word.chars().count() == 5 && word.to_lowercase().chars().all(|c| matches!(c, 'a'..='z')) {
+                if word.chars().count() == 5 && word.chars().all(|c| matches!(c, 'a'..='z')) {
                     // Check word does not contain duplicate characters
-                    let mut char_vec: Vec<char> = word.chars().collect();
-                    let char_vec_copy = char_vec.clone();
-                    char_vec.dedup();
-
-                    if char_vec == char_vec_copy {
+                    if string_has_unique_chars(&word) {
                         word_list.push(word);
                     }
                 }
@@ -46,4 +42,16 @@ fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
+}
+
+fn string_has_unique_chars(string: &String) -> bool {
+    let mut char_vec: Vec<char> = string.chars().collect();
+    let char_vec_copy = char_vec.clone();
+    char_vec.dedup();
+
+    if char_vec == char_vec_copy {
+        return true;
+    }
+
+    false
 }
