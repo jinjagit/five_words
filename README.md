@@ -20,6 +20,7 @@ Store each line as a string ('word') in a vec, but filter out 'words' before add
 - contains any duplicate characters
 
 Total runtime: 136 ms
+Resulting Vec contains 18904 words
 
 Idea for next step:
 
