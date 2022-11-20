@@ -2,7 +2,7 @@
 
 ## background
 
-How fast can I find all 5 word lists, where each list does not contain any duplicate letters (25 unique letters)?
+How fast can I find all 5-word lists, where each list does not contain any duplicate letters (25 unique letters), given a specific word list of English words?
 
 Based on question posed in this video: [Someone improved my code by 40,832,277,770%](Someone improved my code by 40,832,277,770%) by Stand-up Maths
 
