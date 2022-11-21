@@ -6,7 +6,7 @@ How fast can I find all 5-word lists, where each list does not contain any dupli
 
 Based on question posed in this video: [Someone improved my code by 40,832,277,770%](https://www.youtube.com/watch?v=c33AZBnRHks) by Stand-up Maths
 
-Some has done it in 6.5 microseconds (vs. the OP's > 1 month!). I'll be happy with < 1 minute (using only a single thread).
+Someone has done it in 6.5 microseconds (vs. the OP's > 1 month!). I'll be happy with < 1 minute (using only a single thread).
 
 Uses this word list: https://raw.githubusercontent.com/dwyl/english-words/master/words.txt
 
@@ -23,16 +23,36 @@ Store each line ('word') as a vec of chars in a vec, but filter out 'words' befo
 - not five characters long
 - contain any duplicate characters
 
-Total runtime: 80 ms
-Resulting Vec contains 18904 words
+Total runtime: 85 ms
+Resulting vec contains 13672 words
 
-Idea for next step:
+#### Idea for next step:
 
 Iterate over Vec, stopping at n-1 element.
-Compare first word with all other words (also a vecs of chars), checking if combined 2 words contain no duplicate chars.
-- If no duplicates, then save the pair of words in a collection, which includes the index of the words: `Vec<[Vec<char>, Vec<char>, [index, index]], [...], ...>`
-- do the same for all words, only checking by combining with words later in Vec... this should never repeat a comparison, and will result in all possible word pairs being checked and filtered.
+Compare first word with all other words, checking if combined 2 words contain no duplicate chars.
+- If no duplicates, then save the pair of words in a collection (or probably a custom Struct), which includes the index of the words: `Vec<[Vec<char>, Vec<char>, [index, index]], [...], ...>`
+- do the same for all words, only checking by combining with words later (than the word being considered as a 'first' word of five) in Vec... this should never repeat a comparison, and will result in all possible word pairs being checked and filtered.
 - use similar process to see which words can be added to the 2-word pairs list
 - now we have a list of word pairs and word triplets that all contain unique letters, so now just need a smart way to check which word pairs can be added to which word triplets.
 
-Maybe it makes more sense to convert each word to a vec of chars when first storing them in a vec: `Vec<Vec<char>>`
+But, finding word pairs with unique letters gives:
+Total runtime: 38867 ms
+word list length: 13672
+word pairs length: 13485382
+
+This is way too many word pairs to then iterate over, looking for which word we can add from our word_list of 5-char words!
+
+But, I realised something, while thinking about this. Each word in the 5-word list must start with a different letter.
+So, at least, we could divide word_list into 26 groups and only ever try concatenating wors from different groups.
+Can we extend this idea further to optimize further?
+
+## super-naive approaches to avoid
+1. Calculate all possible permutations of 25 letters possible from all 26 letters = 403291461126605635584000000, or 4.03 * 10^26
+2. Step through each permutation, checking if each 5-letter word it contains is in the provided word list. Reject permutation as soon as one of 5 words it contains not found, or accept if all 5 found.
+
+1. Calculate all possible permutations of 5-word lists possible from our filtered list of suitable words (18904) = 23988845126655360, or 2.39 * 10^16
+2. Check each permutation's 5 words combined for duplicate characters, if none found add to set of solutions.
+
+This are both super-naive ways to brute-force solve the problem, and are likely to take a loooong time to run!
+
+Resource: https://www.calculatorsoup.com/calculators/discretemathematics/permutations.php
