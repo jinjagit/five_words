@@ -76,10 +76,10 @@ fn vec_has_unique_elements(mut char_vec: Vec<char>) -> bool {
 fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<WordPair> {
     let mut word_pairs: Vec<WordPair> = vec![];
 
-    for (i, char_vec) in word_list.iter().enumerate() {
+    for i in 0..(word_list.len() - 1) {
         if i != word_list.len() - 1 {
             for j in (i + 1)..(word_list.len() - 1) {
-                let mut a = char_vec.clone();
+                let mut a = word_list[i].clone();
                 let mut b = word_list[j].clone();
 
                 a.append(&mut b);
@@ -89,7 +89,7 @@ fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<WordPair> {
 
                 if vec_has_unique_elements(a.clone()) {
                     let word_pair = WordPair {
-                        words: vec![char_vec.clone(), word_list[j].clone()],
+                        words: vec![word_list[i].clone(), word_list[j].clone()],
                         indices: vec![i, j],
                     };
 

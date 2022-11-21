@@ -40,11 +40,28 @@ Total runtime: 38867 ms
 word list length: 13672
 word pairs length: 13485382
 
-This is way too many word pairs to then iterate over, looking for which word we can add from our word_list of 5-char words!
+This seems like way too many word pairs to then iterate over, looking for which word we can add from our word_list of 5-char words!
 
 But, I realised something, while thinking about this. Each word in the 5-word list must start with a different letter.
-So, at least, we could divide word_list into 26 groups and only ever try concatenating wors from different groups.
+So, at least, we could divide the word_list into 26 groups (by first letter) and only ever try concatenating words from different groups.
 Can we extend this idea further to optimize further?
+
+look at word1. Then only iterate over words from the groups (from the 26 groups) that don't start with any letter in the word = 21 groups, to get word pairs.
+
+Then we can try combining word_pairs, which means we can rule out 10 groups (of pairs) each time = only consider 16 groups each time. Still likely to mean approx. 13m * 8m test ops! (and we would still only have 4-word combos, so more to do)
+
+-----------------------------------------
+
+Hmmm, maybe we should try going all the way to 5 words from each word, only moving on when we have proved we can't use that word in any 5-word list...
+
+This means we can stop when we reach words beginning with 'w', since will have tested the words following this point in combination with those preceeding them already, and there cannot be 5 word combos starting from this point & only adding words ahead in the vec.
+
+I might be over-thinking this. maybe it's simpler to use the optimization to slightly improve finding word_pairs, then move to finding word_triplets (only neeed to try words from 16 groups each time), since there are less individual words that word pairs (by many magnitudes)... maybe the list of word_triplets will be orders of magnitude smaller than the word pairs list? This step would be approx. 13m * 8k (much better).
+
+
+
+
+
 
 ## super-naive approaches to avoid
 1. Calculate all possible permutations of 25 letters possible from all 26 letters = 403291461126605635584000000, or 4.03 * 10^26
