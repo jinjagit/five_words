@@ -30,13 +30,13 @@ Resulting vec contains 13672 words
 
 Iterate over Vec, stopping at n-1 element.
 Compare first word with all other words, checking if combined 2 words contain no duplicate chars.
-- If no duplicates, then save the pair of words in a collection (or probably a custom Struct), which includes the index of the words: `Vec<[Vec<char>, Vec<char>, [index, index]], [...], ...>`
+- If no duplicates, then save the pair of words in a collection (a vec of vecs of pairs of vecs of chars)
 - do the same for all words, only checking by combining with words later (than the word being considered as a 'first' word of five) in Vec... this should never repeat a comparison, and will result in all possible word pairs being checked and filtered.
 - use similar process to see which words can be added to the 2-word pairs list
 - now we have a list of word pairs and word triplets that all contain unique letters, so now just need a smart way to check which word pairs can be added to which word triplets.
 
 But, finding word pairs with unique letters gives:
-Total runtime: 10803 ms
+Total runtime: 10121 ms
 word list length: 13672
 word pairs length: 13491017
 
@@ -56,20 +56,22 @@ Hmmm, maybe we should try going all the way to 5 words from each word, only movi
 
 This means we can stop when we reach words beginning with 'w', since will have tested the words following this point in combination with those preceeding them already, and there cannot be 5 word combos starting from this point & only adding words ahead in the vec.
 
-I might be over-thinking this. maybe it's simpler to use the optimization to slightly improve finding word_pairs, then move to finding word_triplets (only neeed to try words from 16 groups each time), since there are less individual words that word pairs (by many magnitudes)... maybe the list of word_triplets will be orders of magnitude smaller than the word pairs list? This step would be approx. 13m * 8k (much better).
+I might be over-thinking this. maybe it's simpler to use the optimization to slightly improve finding word_pairs, then move to finding word_triplets (only need to try words from 16 groups each time), since there are less individual words that word pairs (by many magnitudes)... maybe the list of word_triplets will be orders of magnitude smaller than the word pairs list? This step would be approx. 13m * 8k (much better).
 
+-----------------------------------------
 
-
-
+Another optimization is to remove all words in our new word_pairs from the word_list! Is this true?
+- we can't do this as soon as we find a word pair, as the same word can exist in more than one word_pair
+- we could add the word indices (in word_list) to a vec, then order/dedup after we have found all word_pairs, then remove them from word_list (in reverse order)
 
 
 ## super-naive approaches to avoid
 1. Calculate all possible permutations of 25 letters possible from all 26 letters = 403291461126605635584000000, or 4.03 * 10^26
-2. Step through each permutation, checking if each 5-letter word it contains is in the provided word list. Reject permutation as soon as one of 5 words it contains not found, or accept if all 5 found.
+2. Step through each permutation, checking if each 5-letter word it contains is in the provided word list. Reject permutation as soon as one of 5 words it contains not found, or permutation contains duplicate words, or accept if all 5 different words found.
 
-1. Calculate all possible permutations of 5-word lists possible from our filtered list of suitable words (18904) = 23988845126655360, or 2.39 * 10^16
+1. Calculate all possible permutations of 5-word lists possible from our filtered list of suitable words (13672) = 4738731385347960, or 4.74 * 10^15
 2. Check each permutation's 5 words combined for duplicate characters, if none found add to set of solutions.
 
-This are both super-naive ways to brute-force solve the problem, and are likely to take a loooong time to run!
+These are both super-naive ways to brute-force solve the problem, and are likely to take a loooong time to run!
 
 Resource: https://www.calculatorsoup.com/calculators/discretemathematics/permutations.php

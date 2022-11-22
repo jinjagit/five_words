@@ -4,12 +4,12 @@ use std::path::Path;
 use std::time::SystemTime;
 
 fn main() {
-    println!("calulating...");
+    println!("calculating...");
     println!();
     
     let start = SystemTime::now();
 
-    // First, we read the word_list file and add only words we are interested in to a Vec.
+    // Read the word_list file and add only suitable words to word_list Vec.
     // Words must be 5 letters, with no other character types, and no duplicate characters.
     // 80 ms
 
@@ -24,7 +24,7 @@ fn main() {
                 if word.chars().count() == 5 && word.chars().all(|c| matches!(c, 'a'..='z')) {
                     let char_vec: Vec<char> = word.chars().collect();
                     // Check word does not contain duplicate characters
-                    if vec_has_unique_elements(char_vec.clone()) {
+                    if vec_has_no_dups(char_vec.clone()) {
                         word_list.push(char_vec);
                     }
                 }
@@ -32,7 +32,7 @@ fn main() {
         }
     }
 
-    // Now, we find pairs of words with no shared characters
+    // Find pairs of words with no shared characters
     // 10 s
 
     let word_pairs: Vec<Vec<Vec<char>>> = find_word_pairs(word_list.clone());
@@ -50,30 +50,27 @@ fn main() {
     println!("word pairs length: {:?}", word_pairs.len());
 }
 
-// The output is wrapped in a Result to allow matching on errors
-// Returns an Iterator to the Reader of the lines of the file.
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
 
-fn vec_has_unique_elements(mut char_vec: Vec<char>) -> bool {
-    let mut char_vec_copy = char_vec.clone();
+fn vec_has_no_dups(vec: Vec<char>)-> bool {
+    let len: usize = vec.len();
 
-    char_vec_copy.sort();
-    
-    char_vec.sort();
-    char_vec.dedup();
-
-    if char_vec == char_vec_copy {
-        return true;
+    for i in 0..len {
+        for j in (i + 1)..len {
+            if vec[i] == vec[j] {
+                return false
+            }
+        }
     }
 
-    false
+    true
 }
 
-fn vecs_no_dups(vec_a: Vec<char>, vec_b: Vec<char>)-> bool {
+fn vecs_have_no_dups(vec_a: Vec<char>, vec_b: Vec<char>)-> bool {
     for i in 0..vec_a.len() {
         for j in 0..vec_b.len() {
             if vec_a[i] == vec_b[j] {
@@ -87,11 +84,12 @@ fn vecs_no_dups(vec_a: Vec<char>, vec_b: Vec<char>)-> bool {
 
 fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
     let mut word_pairs: Vec<Vec<Vec<char>>> = vec![];
+    let word_list_len = word_list.len();
 
-    for i in 0..word_list.len() {
-        if i != word_list.len() {
-            for j in (i + 1)..word_list.len() {
-                if vecs_no_dups(word_list[i].clone(), word_list[j].clone()) {
+    for i in 0..word_list_len {
+        if i != word_list_len - 1 {
+            for j in (i + 1)..word_list_len {
+                if vecs_have_no_dups(word_list[i].clone(), word_list[j].clone()) {
                     let word_pair: Vec<Vec<char>> = vec![word_list[i].clone(), word_list[j].clone()];
 
                     word_pairs.push(word_pair);
@@ -102,6 +100,8 @@ fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
 
     word_pairs
 }
+
+// Debug output
 
 fn print_word_list(word_list: Vec<Vec<char>>) {
     for (_i, char_vec) in word_list.iter().enumerate() {
