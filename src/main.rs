@@ -11,6 +11,7 @@ fn main() {
 
     // First, we read the word_list file and add only words we are interested in to a Vec.
     // Words must be 5 letters, with no other character types, and no duplicate characters.
+    // 80 ms
 
     let mut word_list: Vec<Vec<char>> = vec![];
 
@@ -30,6 +31,9 @@ fn main() {
             }
         }
     }
+
+    // Now, we find pairs of words with no shared characters
+    // 10 s
 
     let word_pairs: Vec<Vec<Vec<char>>> = find_word_pairs(word_list.clone());
 
@@ -84,22 +88,15 @@ fn vecs_no_dups(vec_a: Vec<char>, vec_b: Vec<char>)-> bool {
 fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
     let mut word_pairs: Vec<Vec<Vec<char>>> = vec![];
 
-    for i in 0..(word_list.len() - 1) {
-        if i != word_list.len() - 1 {
-            for j in (i + 1)..(word_list.len() - 1) {
-                // println!("---------------------------------");
-                // println!("{:?}", a.clone());
-
+    for i in 0..word_list.len() {
+        if i != word_list.len() {
+            for j in (i + 1)..word_list.len() {
                 if vecs_no_dups(word_list[i].clone(), word_list[j].clone()) {
                     let word_pair: Vec<Vec<char>> = vec![word_list[i].clone(), word_list[j].clone()];
-
-                    // println!("{:?}", word_pair);
 
                     word_pairs.push(word_pair);
                 }
             }
-
-            // println!("i = {:?}", i);
         }
     }
 
