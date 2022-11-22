@@ -114,17 +114,17 @@ fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
 fn find_word_pairs_2(word_lists: HashMap<char, Vec<Vec<char>>>, letters: Vec<char>) -> Vec<Vec<Vec<char>>> {
     let mut word_pairs: Vec<Vec<Vec<char>>> = vec![]; // TODO: Update to 26 word lists
 
-    for i in 0..26 {
+    for i in 0..26 { // every list
         let word_list_1 = word_lists[&letters[i]].clone();
 
-        for j in 0..word_list_1.len() {
+        for j in 0..word_list_1.len() { // every word
             let word_a = word_list_1[j].clone();
 
             for k in (i + 1)..26 {
-                if !word_a.contains(&letters[k]) {
+                if !word_a.contains(&letters[k]) { // every list beyond 1st list and excluding for letters of word1
                     let word_list_2 = word_lists[&letters[k]].clone();
 
-                    for l in 0..word_list_2.len() {
+                    for l in 0..word_list_2.len() { // every word
                         if vecs_have_no_dups(word_list_1[j].clone(), word_list_2[l].clone()) {
                             let word_pair: Vec<Vec<char>> = vec![word_list_1[j].clone(), word_list_2[l].clone()];
         
