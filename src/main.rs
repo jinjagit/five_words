@@ -69,21 +69,28 @@ fn vec_has_unique_elements(mut char_vec: Vec<char>) -> bool {
     false
 }
 
+fn vecs_no_dups(vec_a: Vec<char>, vec_b: Vec<char>)-> bool {
+    for i in 0..vec_a.len() {
+        for j in 0..vec_b.len() {
+            if vec_a[i] == vec_b[j] {
+                return false
+            }
+        }
+    }
+
+    true
+}
+
 fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
     let mut word_pairs: Vec<Vec<Vec<char>>> = vec![];
 
     for i in 0..(word_list.len() - 1) {
         if i != word_list.len() - 1 {
             for j in (i + 1)..(word_list.len() - 1) {
-                let mut a = word_list[i].clone();
-                let mut b = word_list[j].clone();
-
-                a.append(&mut b);
-
                 // println!("---------------------------------");
                 // println!("{:?}", a.clone());
 
-                if vec_has_unique_elements(a.clone()) {
+                if vecs_no_dups(word_list[i].clone(), word_list[j].clone()) {
                     let word_pair: Vec<Vec<char>> = vec![word_list[i].clone(), word_list[j].clone()];
 
                     // println!("{:?}", word_pair);

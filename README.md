@@ -36,7 +36,7 @@ Compare first word with all other words, checking if combined 2 words contain no
 - now we have a list of word pairs and word triplets that all contain unique letters, so now just need a smart way to check which word pairs can be added to which word triplets.
 
 But, finding word pairs with unique letters gives:
-Total runtime: 38867 ms
+Total runtime: 10578 ms
 word list length: 13672
 word pairs length: 13485382
 
