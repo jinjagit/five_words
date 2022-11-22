@@ -3,14 +3,10 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::time::SystemTime;
 
-#[derive(Debug)]
-#[derive(Clone)]
-struct WordPair {
-    words: Vec<Vec<char>>,
-    indices: Vec<usize>
-}
-
 fn main() {
+    println!("calulating...");
+    println!();
+    
     let start = SystemTime::now();
 
     // First, we read the word_list file and add only words we are interested in to a Vec.
@@ -35,7 +31,7 @@ fn main() {
         }
     }
 
-    let word_pairs: Vec<WordPair> = find_word_pairs(word_list.clone());
+    let word_pairs: Vec<Vec<Vec<char>>> = find_word_pairs(word_list.clone());
 
     let end = SystemTime::now();
     let duration = end.duration_since(start).unwrap();
@@ -73,8 +69,8 @@ fn vec_has_unique_elements(mut char_vec: Vec<char>) -> bool {
     false
 }
 
-fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<WordPair> {
-    let mut word_pairs: Vec<WordPair> = vec![];
+fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
+    let mut word_pairs: Vec<Vec<Vec<char>>> = vec![];
 
     for i in 0..(word_list.len() - 1) {
         if i != word_list.len() - 1 {
@@ -88,10 +84,7 @@ fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<WordPair> {
                 // println!("{:?}", a.clone());
 
                 if vec_has_unique_elements(a.clone()) {
-                    let word_pair = WordPair {
-                        words: vec![word_list[i].clone(), word_list[j].clone()],
-                        indices: vec![i, j],
-                    };
+                    let word_pair: Vec<Vec<char>> = vec![word_list[i].clone(), word_list[j].clone()];
 
                     // println!("{:?}", word_pair);
 
@@ -112,7 +105,7 @@ fn print_word_list(word_list: Vec<Vec<char>>) {
     }
 }
 
-fn print_word_pairs(word_pairs: Vec<WordPair>) {
+fn print_word_pairs(word_pairs: Vec<Vec<Vec<char>>>) {
     for (_i, pair) in word_pairs.iter().enumerate() {
         println!("{:?}", pair);
     }
