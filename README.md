@@ -92,6 +92,10 @@ Then, we can tell if we got anything by n_words (if no change, then found nothin
 Make decision on next search based on what we get back
 ? how to know when to finish ? (when we are ready to process first word in 23nd list, at n_words == 1, as cannot make 5 word chain from there!)
 
+Given we know we can often stop iterating over lists early (as not enough lists left to form 5-word chain), and also we know that checking for 5th word has lower probablity of finding suitable word, than say for the 3rd word, and checking for 5th word will always occur in a later word list, we can optimize our search by always iterating over lists in order of ascending size. Especially as the variation of size is quite large:
+
+24 72 110 149 258 262 293 300 335 338 349 415 465 523 557 627 630 667 748 770 789 793 852 999 1024 1323
+
 
 ## super-naive approaches to avoid
 1. Calculate all possible permutations of 25 letters possible from all 26 letters = 403291461126605635584000000, or 4.03 * 10^26
