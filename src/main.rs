@@ -37,7 +37,8 @@ fn main() {
         }
     }
 
-    let word_lists = word_lists_into_vec(word_lists_hashmap.clone());
+    let unordered_word_lists = word_lists_into_vec(word_lists_hashmap.clone());
+    let word_lists = order_word_lists_ascending_size(unordered_word_lists.clone());
 
     // Find pairs of words with no shared characters
     // 10 s
@@ -66,6 +67,9 @@ fn main() {
     let (result, index, word) = find_next_word(first_word.clone(), word_lists[0].clone(), 25);
     println!();
     println!("test 2: {:?} {:?}", first_word, (result, index, word));
+
+    println!();
+    print_word_list_sizes(word_lists.clone());
 
     println!();
     println!("Total runtime: {} ms", duration.as_millis());
@@ -115,6 +119,27 @@ fn word_lists_into_vec(hashmap: HashMap<char, Vec<Vec<char>>>) -> Vec<Vec<Vec<ch
     word_lists
 }
 
+fn order_word_lists_ascending_size(mut word_lists: Vec<Vec<Vec<char>>>) -> Vec<Vec<Vec<char>>> {
+    let mut ordered_lists = vec![];
+
+    while word_lists.len() > 0 {
+        let mut smallest_index: usize = 999999;
+        let mut smallest_list: usize = 999999;
+
+        for i in 0..word_lists.len() {
+            if word_lists[i].len() < smallest_list {
+                smallest_list = word_lists[i].len();
+                smallest_index = i;
+            }
+        }
+
+        ordered_lists.push(word_lists[smallest_index].clone());
+        word_lists.remove(smallest_index);
+    }
+
+    ordered_lists
+}
+
 // fn that, given a word, a word list & a starting index, iterates over single word list,
 // looking for a word that joined to given word, starting from the given index.
 // If found, then it returns: (true, index of word that was found, word found)
@@ -128,7 +153,15 @@ fn find_next_word(word: Vec<char>, list: Vec<Vec<char>>, start: usize) -> (bool,
     }
 
     (false, 0, vec![])
-} 
+}
+
+fn print_word_list_sizes(word_lists: Vec<Vec<Vec<char>>>) {
+    for i in 0..26 {
+        print!("{:?} ", word_lists[i].len());
+    }
+
+    println!()
+}
 
 
 // Debug output
