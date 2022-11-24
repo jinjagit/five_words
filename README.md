@@ -60,9 +60,37 @@ I might be over-thinking this. maybe it's simpler to use the optimization to sli
 
 -----------------------------------------
 
-Another optimization is to remove all words in our new word_pairs from the word_list! Is this true?
-- we can't do this as soon as we find a word pair, as the same word can exist in more than one word_pair
-- we could add the word indices (in word_list) to a vec, then order/dedup after we have found all word_pairs, then remove them from word_list (in reverse order)
+If we use the 26 word lists approach:
+
+If we focus on testing each word as a starting word (from list n, where n is list_index(by alphabetical order, but probably doesn't have to be!)):
+We iterate over lists, (ignoring 5 + n lists) if we fail to build a suitable pair (if exhaust list 26-5-n-3), we move on to next word as starting word...
+if we build a word pair, store the index of the word we have paired with, then move on to iterating over lists again from next list (now ignoring 10 lists)...
+... if not, we return to next 2nd word (or if exhaust list 26-10-i-2)
+if we build a triplet, store index, iterate again from next list (ignoring 15 lists)... if not, we return to next 2nd word (or if exhaust penulitmate list 26-15-n-1)
+if we build a quartet, store index, iterate again from next list (ignoring 20 lists)... if not, we return to next 3rd word (or if exhaust last list 26-20-n, which is just the last list 'z'... just go to the end if we have quartet!)
+if we build a quintet, store quintet, iterate again from next word (ignoring 20 lists) (limit = finish last list)
+
+Need to keep track of:
+n-words-chained (1-5) n_words
+list of last successfully added word or starting word (0-25) list_index
+index of last successfully added word or starting word (0-some usize) word_index
+
+start at n_words, list_index, word_index (1, 0, 0)
+
+iterate over words, starting in next list 
+
+fn search_lists(start_list, end_list, word) {
+
+  if find_word to add {
+    return new longer word + n_words(now += 1), list_index, word_index
+  }
+
+  word(original) + n_words, list_index, word_index
+}
+
+Then, we can tell if we got anything by n_words (if no change, then found nothing)
+Make decision on next search based on what we get back
+? how to know when to finish ? (when we are ready to process first word in 23nd list, at n_words == 1, as cannot make 5 word chain from there!)
 
 
 ## super-naive approaches to avoid
