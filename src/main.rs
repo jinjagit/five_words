@@ -58,15 +58,17 @@ fn main() {
     print_word_lists_hashmap(word_lists_hashmap.clone(), letters.clone());
     println!();
     println!("first item, first list: {:?}", word_lists[0][0].clone());
+    println!();
 
     let first_word = vec!['y', 'u', 'r', 't', 's'];
-    let (result, index, word) = find_next_word(first_word.clone(), word_lists[0].clone(), 0);
-    println!();
+    let (result, index, word) = find_next_word(first_word.clone(), word_lists[4].clone(), 0);
     println!("test 1: {:?} {:?}", first_word, (result, index, word));
 
-    let (result, index, word) = find_next_word(first_word.clone(), word_lists[0].clone(), 25);
-    println!();
+    let (result, index, word) = find_next_word(first_word.clone(), word_lists[4].clone(), 25);
     println!("test 2: {:?} {:?}", first_word, (result, index, word));
+
+    let (result, index, word) = find_next_word(vec!['i', 'i', 'i', 'i', 'i'], word_lists[4].clone(), 25);
+    println!("test 3: {:?} {:?}", vec!['i', 'i', 'i', 'i', 'i'], (result, index, word));
 
     println!();
     print_word_list_sizes(word_lists.clone());
@@ -140,8 +142,8 @@ fn order_word_lists_ascending_size(mut word_lists: Vec<Vec<Vec<char>>>) -> Vec<V
     ordered_lists
 }
 
-// fn that, given a word, a word list & a starting index, iterates over single word list,
-// looking for a word that joined to given word, starting from the given index.
+// Given a word, a word list & a starting index, iterates over single word list,
+// looking for a word that can be joined to given word, starting from the given index.
 // If found, then it returns: (true, index of word that was found, word found)
 // Else returns:              (false, 0, empty vec)
 
