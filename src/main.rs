@@ -39,20 +39,15 @@ fn main() {
 
     let unordered_word_lists = word_lists_into_vec(word_lists_hashmap.clone());
     let word_lists = order_word_lists_ascending_size(unordered_word_lists.clone());
-
-    // Find pairs of words with no shared characters
-    // 10 s
-
-    // let word_pairs: Vec<Vec<Vec<char>>> = find_word_pairs(word_list.clone());
-    // let word_pairs: Vec<Vec<Vec<char>>> = find_word_pairs_2(word_lists_hashmap.clone(), letters.clone());
+    
+    let solution = solve(word_lists.clone()); // Todo: Remove the clone() ?
 
     let end = SystemTime::now();
     let duration = end.duration_since(start).unwrap();
 
-    // print_word_list(word_list.clone());
-    // println!();
-    // print_word_pairs(word_pairs.clone());
-    // println!("{:?}", word_pairs[13].clone());
+    
+    
+    // DEBUG output
 
     println!();
     print_word_lists_hashmap(word_lists_hashmap.clone(), letters.clone());
@@ -147,9 +142,160 @@ fn order_word_lists_ascending_size(mut word_lists: Vec<Vec<Vec<char>>>) -> Vec<V
 // If found, then it returns: (true, index of word that was found, word found)
 // Else returns:              (false, 0, empty vec)
 
-fn find_next_word(word: Vec<char>, list: Vec<Vec<char>>, start: usize) -> (bool, usize, Vec<char>) {
+fn solve(word_lists: Vec<Vec<Vec<char>>>) -> Vec<Vec<char>> {
+    let mut solutions: Vec<Vec<char>> = vec![];
+    
+    // Iterate over every word in each list in word_lists, except last 4 lists
+    for i in 0..22 {
+        let word_list = word_lists[i].clone();
+
+        for j in 0..word_list.len() {
+            // Do clever things that exhaust all potential searches for suitable 5-word chain (efficiently)
+            // where word_list[j] would be 1st word in any such chain found.
+
+            let mut word = word_list[j].clone(); // Not sure we need this!
+            let mut chain: Vec<char> = word.clone();
+            let mut chain_n: usize = 1; // length of current chain 1 - 5
+            let mut list_index = i + 1; // index of list to search (start at next list)
+            let mut start = 0; // index in list to start/continue searching from (start at beginning of next list)
+            // let mut last_in_list = word_lists[0].len() -1;
+
+            // Store of last start position at each chain_n. HashMap<chain_n, (list, index)>
+            let mut regressions: HashMap<usize, (usize, usize)> = HashMap::from([(2, (0, 0)), (3, (0, 0)), (4, (0, 0)), (5, (0, 0))]);
+
+            loop {
+                // This needs the chain as a single word vec (Vec<chars>)
+                // So how do we store the chain? What is most efficient?
+                let (found_next, found_at, found_word) = find_next_word(chain.clone(), word_lists[list_index].clone(), start);      
+                
+                // Maybe we should deal with found_next == false first.
+                // I suspect this simplifies the found_next == true case
+
+                if found_next == false {
+                    // Are there enough lists left to possibly build 5-word-chain?
+                    // Yes, go to next list
+                    if chain_possible_from_list(list_index + 1, chain_n) == true {
+                        list_index += 1;
+                        start = 0;
+                        break;
+                    } else { // Search for regression point to continue from
+                        loop {
+                            chain_n -= 1;
+
+                            if chain_n == 1 { // We exhausted the last possible 2nd word list, so it's over for this 1st word.
+                                break;
+                            } else {
+                                chain = remove_word(chain.clone());
+
+                                let (regression_list, regression_index) = regressions[&chain_n];
+                                // if regression point is end of list
+                                if regression_index == word_lists[regression_list].len() - 1 {
+
+                                } else { // Continue from regression point
+                                    list_index = regression_index;
+                                    start = regression_index + 1;
+                                    break;
+                                }
+                            }
+    
+                        }
+                    }
+                    // No, regress to chain - 1 word (break if already at chain_n == 1, and then break again in this case)
+                }
+
+                if chain_n == 1 { break; } // We have failed to a 2nd word from last possible list for 2nd words. 
+
+                // Found a word. Add it to chain.
+                // if found_next == true {
+                //     chain = add_word(chain.clone(), found_word.clone());
+                //     *regressions.get_mut(&chain_n).unwrap() = (list_index, found_at); // Store the regression point
+                //     chain_n += 1;
+
+                //     // Found a 5-word chain. Add chain to solutions.
+                //     if chain_n == 5 {
+                //         solutions.push(chain.clone());
+
+                //         println!("{:?}: {:?}", solutions.len(), chain.clone()); // DEBUG
+                //     }
+                // }
+
+                // Find next starting point (and set the chain_n & chain contents accordingly)
+                //
+                // What should this return / provide (set)?
+                //   List index, starting index, and chain_n of next starting point.
+                //   Truncated chain, if chain_n reduced
+
+                // If found_next == true
+                //   If chain_n < 5
+                //     (A) If next list is not too close to end of word_lists
+                //       (B) Set first index of next list as start
+                //     Else (C) step back to chain_n level last word discovery point = regression
+                //       If regression is end of list do check (A)
+                //         If passes. do (B)
+                //         If fails do (C)
+                //     Else new start = regression + 1 position
+                //
+                // If chain == 5 (special case, found a 5-word chain)
+
+                if found_next == true {
+                    // If chain_n < 5
+                    loop {
+                        if chain_possible_from_list(list_index + 1, chain_n) == true {
+                            list_index += 1;
+                            start = 0;
+                            break;
+                        } else {
+                            chain_n -= 1;
+                            chain = remove_word(chain.clone());
+
+                            let (regression_list, regression_index) = regressions[&chain_n];
+                            // if regression point is end of list
+                            if regression_index == word_lists[regression_list].len() - 1 {
+
+                            } else {
+                                list_index = regression_index;
+                                start = regression_index + 1;
+                                break;
+                            }
+                             
+                            // else continue from regression point
+                        }
+                    }
+                }
+
+                // Else (found_next) == false
+
+                // If found a 2, 3, or 4-word chain: found_next == true
+                // 
+                // (A) Then, move on to next list and look for next word in chain...
+                // Unless not enough lists left to make 5-word chain, in which case
+                // Go back to previous level and continue looking from that point in that list...
+                // Unless already at end of that list...
+                // In which case go to next list, unless not enough lists left to make 5-word chain... which is a loop with start at (A)
+                // Break if we get to chain_n == 1 at last word in the current list[i]
+                //
+                // So, we need a function that does this and returns either the chain-level (chain_n), list index and index in list of a valid starting point...
+                // or returns something that signals search is exhausted
+
+
+                // If failed to find a 2, 3, 4 or 5 word chain: found next == false
+                //
+                // Basically, do the same as in loop (A), above. Any differences?
+
+                // Condition for breaking out to next starting word iteration (in j) - Need to check this!
+                // if found_next == false && chain_n == 1 && start == last_in_list { break; } // Exhausted trees possible, starting from words in this list
+
+                // find_next_word
+            }
+        }
+    }
+
+    solutions
+}
+
+fn find_next_word(chain: Vec<char>, list: Vec<Vec<char>>, start: usize) -> (bool, usize, Vec<char>) {
     for i in start..list.len() {
-        if vecs_have_no_dups(word.clone(), list[i].clone()) {
+        if vecs_have_no_dups(chain.clone(), list[i].clone()) {
             return (true, i, list[i].clone());
         }
     }
@@ -157,12 +303,28 @@ fn find_next_word(word: Vec<char>, list: Vec<Vec<char>>, start: usize) -> (bool,
     (false, 0, vec![])
 }
 
-fn print_word_list_sizes(word_lists: Vec<Vec<Vec<char>>>) {
-    for i in 0..26 {
-        print!("{:?} ", word_lists[i].len());
+// Add word (Vec<char>) to word-chain (Vec<char>)
+fn add_word(mut chain: Vec<char>, word: Vec<char>) -> Vec<char> {
+    for i in 0..5 {
+        chain.push(word[i]);
     }
 
-    println!()
+    chain
+}
+
+// Remove last word (Vec<char>) from word-chain (Vec<char>)
+fn remove_word(mut chain: Vec<char>) -> Vec<char> {
+    for _i in 0..5 {
+        chain.pop();
+    }
+
+    chain
+}
+
+fn chain_possible_from_list(list_index: usize, chain_n: usize) -> bool {
+    if (list_index + 5 - chain_n) > 25 { return false; }
+
+    true
 }
 
 
@@ -183,13 +345,30 @@ fn print_word_lists_hashmap(word_lists_hashmap: HashMap<char, Vec<Vec<char>>>, l
     }
 }
 
+fn print_word_list_sizes(word_lists: Vec<Vec<Vec<char>>>) {
+    for i in 0..26 {
+        print!("{:?} ", word_lists[i].len());
+    }
+
+    println!()
+}
+
 // fn print_word_pairs(word_pairs: Vec<Vec<Vec<char>>>) {
 //     for (_i, pair) in word_pairs.iter().enumerate() {
 //         println!("{:?}", pair);
 //     }
 // }
 
+
+
+
 // Store of unused functions
+
+// fn concatenate_vecs(mut vec_a: Vec<char>, mut vec_b: Vec<char>) -> Vec<char> { 
+//     vec_a.append(&mut vec_b);
+
+//     vec_a.clone()
+// }
 
 // fn find_word_pairs(word_list: Vec<Vec<char>>) -> Vec<Vec<Vec<char>>> {
 //     let mut word_pairs: Vec<Vec<Vec<char>>> = vec![];
